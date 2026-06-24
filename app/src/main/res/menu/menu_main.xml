@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/li_perfil"
+        android:checkable="false"
+        android:checked="false"
+        android:enabled="true"
+        android:icon="@drawable/save"
+        android:title="PERFIL"
+        android:visible="true"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/li_cita"
+        android:title="Cita"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/li_salir"
+        android:title="Salir"
+        app:showAsAction="never" />
+</menu>
