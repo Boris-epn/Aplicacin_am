@@ -9,7 +9,7 @@
     android:background="#FAF9F5"
     android:orientation="vertical"
     android:visibility="visible"
-    tools:context=".FirstActivity">
+    tools:context=".HomeActivity">
 
     <TextView
         android:id="@+id/textView5"
