@@ -149,12 +149,18 @@
 
             <TextView
                 android:id="@+id/txt_cardiologia"
-                android:layout_width="match_parent"
+                android:layout_width="100dp"
                 android:layout_height="20dp"
+                android:layout_gravity="center_horizontal"
                 android:text="Cardiología"
                 android:textAlignment="center"
                 android:textColor="#C53030" />
         </LinearLayout>
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="93dp"
+            android:layout_weight="1" />
 
         <Space
             android:layout_width="wrap_content"
@@ -163,8 +169,8 @@
 
         <LinearLayout
             android:id="@+id/ly_traumatologia"
-            android:layout_width="185dp"
-            android:layout_height="98dp"
+            android:layout_width="199dp"
+            android:layout_height="96dp"
             android:background="@drawable/bg_rounded_traumatologia"
             android:orientation="vertical">
 
@@ -177,8 +183,9 @@
 
             <TextView
                 android:id="@+id/textView10"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_width="100dp"
+                android:layout_height="20dp"
+                android:layout_gravity="center_horizontal"
                 android:text="Traumatología"
                 android:textAlignment="center"
                 android:textColor="#1E429F" />
@@ -186,56 +193,59 @@
     </LinearLayout>
 
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="118dp"
+        android:layout_width="407dp"
+        android:layout_height="108dp"
+        android:layout_gravity="center_horizontal"
         android:orientation="horizontal">
 
         <LinearLayout
             android:id="@+id/ly_oftalmologia"
-            android:layout_width="203dp"
-            android:layout_height="match_parent"
+            android:layout_width="199dp"
+            android:layout_height="96dp"
             android:background="@drawable/bg_rounded_oftalmologia"
             android:orientation="vertical">
 
             <ImageButton
                 android:id="@+id/imageButton11"
                 android:layout_width="match_parent"
-                android:layout_height="76dp"
+                android:layout_height="67dp"
                 android:background="@android:color/transparent"
                 app:srcCompat="@drawable/ojo" />
 
             <TextView
                 android:id="@+id/textView11"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_width="100dp"
+                android:layout_height="20dp"
+                android:layout_gravity="center_horizontal"
                 android:text="Oftalmología"
                 android:textAlignment="center"
                 android:textColor="#6B21A8" />
         </LinearLayout>
 
         <Space
-            android:layout_width="40dp"
-            android:layout_height="match_parent"
+            android:layout_width="0dp"
+            android:layout_height="93dp"
             android:layout_weight="1" />
 
         <LinearLayout
             android:id="@+id/ly_medicina"
-            android:layout_width="189dp"
-            android:layout_height="match_parent"
+            android:layout_width="199dp"
+            android:layout_height="96dp"
             android:background="@drawable/bg_rounded_medicina"
             android:orientation="vertical">
 
             <ImageButton
                 android:id="@+id/imgbtn_medicinageneral"
                 android:layout_width="match_parent"
-                android:layout_height="75dp"
+                android:layout_height="67dp"
                 android:background="@android:color/transparent"
                 app:srcCompat="@drawable/latido_del_corazon" />
 
             <TextView
                 android:id="@+id/textView12"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="20dp"
+                android:layout_gravity="center_horizontal"
                 android:text="Medicina General"
                 android:textAlignment="center"
                 android:textColor="#7BA289" />
