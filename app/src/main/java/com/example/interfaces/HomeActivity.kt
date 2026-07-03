@@ -8,6 +8,9 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Locale
 
 class HomeActivity : AppCompatActivity() {
     @SuppressLint("MissingInflatedId")
@@ -15,6 +18,15 @@ class HomeActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_home)
+
+        // Mostrar fecha actual
+        val txtFecha = findViewById<TextView>(R.id.txt_fecha)
+        val calendar = Calendar.getInstance()
+        val localeSpanish = Locale.forLanguageTag("es")
+        val simpleDateFormat = SimpleDateFormat("EEEE, d 'de' MMMM", localeSpanish)
+        val fecha = simpleDateFormat.format(calendar.time)
+        txtFecha.text = fecha.replaceFirstChar { it.uppercase() }
+
         //recibo valores
         val recibo = intent.getStringExtra("clave")
         //muestro valores
