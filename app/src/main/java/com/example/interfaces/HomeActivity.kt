@@ -1,6 +1,7 @@
 package com.example.interfaces
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -9,7 +10,6 @@ import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import java.text.SimpleDateFormat
-import java.util.Calendar
 import java.util.Locale
 
 class HomeActivity : AppCompatActivity() {
@@ -21,11 +21,9 @@ class HomeActivity : AppCompatActivity() {
 
         // Mostrar fecha actual
         val txtFecha = findViewById<TextView>(R.id.txt_fecha)
-        val calendar = Calendar.getInstance()
-        val localeSpanish = Locale.forLanguageTag("es")
-        val simpleDateFormat = SimpleDateFormat("EEEE, d 'de' MMMM", localeSpanish)
-        val fecha = simpleDateFormat.format(calendar.time)
-        txtFecha.text = fecha.replaceFirstChar { it.uppercase() }
+        val sdf = SimpleDateFormat("EEEE, d 'de' MMMM", Locale.forLanguageTag("es-EC"))
+        val fechaActual = sdf.format(java.util.Date())
+        txtFecha.text = fechaActual.replaceFirstChar { it.uppercase() }
 
         //recibo valores
         val recibo = intent.getStringExtra("clave")
@@ -50,7 +48,10 @@ class HomeActivity : AppCompatActivity() {
                 Toast.makeText(this, "Cita", Toast.LENGTH_SHORT).show()
             }
             R.id.li_salir -> {
-                Toast.makeText(this, "Salir", Toast.LENGTH_SHORT).show()
+                val intent = Intent(this, LoginActivity::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                startActivity(intent)
+                finish()
             }
         }
         return super.onOptionsItemSelected(item)

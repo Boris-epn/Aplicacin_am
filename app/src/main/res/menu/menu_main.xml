@@ -6,7 +6,7 @@
         android:checkable="false"
         android:checked="false"
         android:enabled="true"
-        android:icon="@drawable/save"
+        android:icon="@android:drawable/ic_menu_agenda"
         android:title="PERFIL"
         android:visible="true"
         app:showAsAction="ifRoom" />
@@ -16,6 +16,6 @@
         app:showAsAction="never" />
     <item
         android:id="@+id/li_salir"
-        android:title="Salir"
+        android:title="Cerrar sesión"
         app:showAsAction="never" />
 </menu>
