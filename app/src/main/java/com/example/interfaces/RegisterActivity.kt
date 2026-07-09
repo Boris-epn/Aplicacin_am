@@ -16,6 +16,9 @@ class RegisterActivity : AppCompatActivity() {
         enableEdgeToEdge()
         setContentView(R.layout.activity_register)
 
+        // Habilitar flecha de retroceso
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+
         val etNombre = findViewById<EditText>(R.id.et_nombre)
         val etFecha = findViewById<EditText>(R.id.et_anio)
         val etPin = findViewById<EditText>(R.id.et_pin)

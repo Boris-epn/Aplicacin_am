@@ -14,7 +14,8 @@
         <activity
             android:name=".RegisterActivity"
             android:exported="false"
-            android:label="Vitus" />
+            android:label="Vitus"
+            android:parentActivityName=".LoginActivity" />
         <activity
             android:name=".LoginActivity"
             android:exported="true"
@@ -31,6 +32,7 @@
             android:name=".HomeActivity"
             android:exported="false"
             android:label="Home"
+            android:parentActivityName=".LoginActivity"
             android:theme="@style/Theme.MisActivities"
             android:windowSoftInputMode="adjustResize" />
 

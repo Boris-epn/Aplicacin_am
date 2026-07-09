@@ -19,6 +19,9 @@ class HomeActivity : AppCompatActivity() {
         enableEdgeToEdge()
         setContentView(R.layout.activity_home)
 
+        // Habilitar flecha de retroceso
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+
         // Mostrar fecha actual
         val txtFecha = findViewById<TextView>(R.id.txt_fecha)
         val sdf = SimpleDateFormat("EEEE, d 'de' MMMM", Locale.forLanguageTag("es-EC"))
