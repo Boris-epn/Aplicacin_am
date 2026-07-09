@@ -13,7 +13,8 @@
         android:theme="@style/Theme.Interfaces">
         <activity
             android:name=".RegisterActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:label="Vitus" />
         <activity
             android:name=".LoginActivity"
             android:exported="true"
