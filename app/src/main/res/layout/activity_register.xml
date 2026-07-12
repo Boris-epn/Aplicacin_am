@@ -45,6 +45,26 @@
             android:layout_marginBottom="20dp" />
 
         <TextView
+            android:id="@+id/lbl_correo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Correo electrónico:"
+            android:textSize="20sp"
+            android:textColor="#000000"
+            android:layout_marginBottom="6dp" />
+
+        <EditText
+            android:id="@+id/et_correo"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:inputType="textEmailAddress"
+            android:hint="Ej: juana.perez@vitus.com"
+            android:textSize="18sp"
+            android:padding="12dp"
+            android:background="?android:attr/editTextBackground"
+            android:layout_marginBottom="20dp" />
+
+        <TextView
             android:id="@+id/lbl_cedula"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

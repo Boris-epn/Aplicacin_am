@@ -39,7 +39,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:ems="10"
-        android:hint="Password"
+        android:hint="PIN"
         android:inputType="textPassword" />
 
     <Button

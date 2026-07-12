@@ -1,12 +1,19 @@
 package com.example.interfaces
 
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
-import androidx.appcompat.app.AppCompatActivity
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.edit
+import androidx.lifecycle.lifecycleScope
+import com.example.interfaces.data.repository.VitusRepository
+import com.example.interfaces.data.session.SessionManager
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class LoginActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -14,46 +21,50 @@ class LoginActivity : AppCompatActivity() {
         enableEdgeToEdge()
         setContentView(R.layout.activity_main_login)
 
-        // SharedPreferences
-        val sharedPreferences = getSharedPreferences("LoginPrefs", Context.MODE_PRIVATE)
-
-        // Recupero valores ...
+        val repository = VitusRepository.getInstance(applicationContext)
         val mail = findViewById<EditText>(R.id.txt_mail)
         val pass = findViewById<EditText>(R.id.txt_pass)
         val login = findViewById<Button>(R.id.btn_login)
         val signUp = findViewById<Button>(R.id.btn_signUp)
 
-        // Cargar usuario guardado
-        val savedMail = sharedPreferences.getString("user_mail", "")
-        mail.setText(savedMail)
+        mail.setText(getSharedPreferences("LoginPrefs", MODE_PRIVATE).getString("user_mail", ""))
 
-        // Evento para el botón ...
-//        login.setOnClickListener {
-//            Log.d("MainActivity", "Estoy dando click al botón")
-//            val msg = mail.text.toString()
-//            val tel = phone.text.toString()
-//            val a = "correo $msg phone $tel"
-//            Toast.makeText(this, a, Toast.LENGTH_LONG).show()
-//
-//        }
-        // BOTON LOGIN
         login.setOnClickListener {
-            val userMail = mail.text.toString()
+            val userMail = mail.text.toString().trim()
+            val userPin = pass.text.toString().trim()
 
-            // Guardar en SharedPreferences
-            val editor = sharedPreferences.edit()
-            editor.putString("user_mail", userMail)
-            editor.apply()
+            if (userMail.isEmpty() || userPin.isEmpty()) {
+                Toast.makeText(this, "Completa correo y PIN", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
 
-            val intent = Intent(this, HomeActivity::class.java)
-            intent.putExtra("clave", userMail)
-            startActivity(intent)
+            lifecycleScope.launch {
+                val user = withContext(Dispatchers.IO) {
+                    repository.loginUser(userMail, userPin)
+                }
+
+                if (user == null) {
+                    Toast.makeText(this@LoginActivity, "Correo o PIN incorrectos", Toast.LENGTH_SHORT).show()
+                    return@launch
+                }
+
+                getSharedPreferences("LoginPrefs", MODE_PRIVATE)
+                    .edit()
+                    .putString("user_mail", user.email)
+                    .apply()
+
+                SessionManager.save(this@LoginActivity, user.id, user.fullName, user.email)
+
+                val intent = Intent(this@LoginActivity, HomeActivity::class.java)
+                intent.putExtra("user_id", user.id)
+                intent.putExtra("user_name", user.fullName)
+                startActivity(intent)
+                finish()
+            }
         }
 
-        // BOTON CREAR CUENTA
         signUp.setOnClickListener {
-            val intent = Intent(this, RegisterActivity::class.java)
-            startActivity(intent)
+            startActivity(Intent(this, RegisterActivity::class.java))
         }
     }
 }

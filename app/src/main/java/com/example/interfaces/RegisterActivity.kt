@@ -8,7 +8,16 @@ import android.widget.EditText
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.edit
+import androidx.lifecycle.lifecycleScope
+import com.example.interfaces.data.repository.VitusRepository
+import com.example.interfaces.data.session.SessionManager
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.text.SimpleDateFormat
 import java.util.Calendar
+import java.util.Locale
 
 class RegisterActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -16,27 +25,30 @@ class RegisterActivity : AppCompatActivity() {
         enableEdgeToEdge()
         setContentView(R.layout.activity_register)
 
-        // Habilitar flecha de retroceso
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
+        val repository = VitusRepository.getInstance(applicationContext)
         val etNombre = findViewById<EditText>(R.id.et_nombre)
+        val etCorreo = findViewById<EditText>(R.id.et_correo)
+        val etCedula = findViewById<EditText>(R.id.et_cedula)
+        val etCelular = findViewById<EditText>(R.id.et_celular)
         val etFecha = findViewById<EditText>(R.id.et_anio)
         val etPin = findViewById<EditText>(R.id.et_pin)
         val etPinConfirm = findViewById<EditText>(R.id.et_pin_confirm)
         val btnRegistro = findViewById<Button>(R.id.btn_registro)
 
         etFecha.setOnClickListener {
-            val c = Calendar.getInstance()
-            val year = c.get(Calendar.YEAR)
-            val month = c.get(Calendar.MONTH)
-            val day = c.get(Calendar.DAY_OF_MONTH)
+            val calendar = Calendar.getInstance()
+            val year = calendar.get(Calendar.YEAR)
+            val month = calendar.get(Calendar.MONTH)
+            val day = calendar.get(Calendar.DAY_OF_MONTH)
 
-            val dpd = DatePickerDialog(this, { _, selectedYear, selectedMonth, selectedDay ->
-                val selectedDate = Calendar.getInstance().apply {
+            val dialog = DatePickerDialog(this, { _, selectedYear, selectedMonth, selectedDay ->
+                val selectedCalendar = Calendar.getInstance().apply {
                     set(selectedYear, selectedMonth, selectedDay, 0, 0, 0)
                     set(Calendar.MILLISECOND, 0)
                 }
-                
+
                 val today = Calendar.getInstance().apply {
                     set(Calendar.HOUR_OF_DAY, 0)
                     set(Calendar.MINUTE, 0)
@@ -44,38 +56,29 @@ class RegisterActivity : AppCompatActivity() {
                     set(Calendar.MILLISECOND, 0)
                 }
 
-                if (selectedDate.after(today)) {
-                    Toast.makeText(this, "La fecha de nacimiento no puede ser futura", Toast.LENGTH_SHORT).show()
+                if (selectedCalendar.after(today)) {
+                    Toast.makeText(this, "La fecha no puede ser futura", Toast.LENGTH_SHORT).show()
                     etFecha.setText("")
                 } else {
-                    var age = today.get(Calendar.YEAR) - selectedDate.get(Calendar.YEAR)
-                    
-                    if (today.get(Calendar.MONTH) < selectedDate.get(Calendar.MONTH) || 
-                        (today.get(Calendar.MONTH) == selectedDate.get(Calendar.MONTH) && 
-                         today.get(Calendar.DAY_OF_MONTH) < selectedDate.get(Calendar.DAY_OF_MONTH))) {
-                        age--
-                    }
-
-                    if (age < 18) {
-                        Toast.makeText(this, "Debes tener al menos 18 años para registrarte", Toast.LENGTH_SHORT).show()
-                        etFecha.setText("")
-                    } else {
-                        etFecha.setText("$selectedDay/${selectedMonth + 1}/$selectedYear")
-                    }
+                    val isoDate = SimpleDateFormat("yyyy-MM-dd", Locale.US).format(selectedCalendar.time)
+                    etFecha.setText(isoDate)
                 }
             }, year, month, day)
-            
-            dpd.datePicker.maxDate = System.currentTimeMillis()
-            dpd.show()
+
+            dialog.datePicker.maxDate = System.currentTimeMillis()
+            dialog.show()
         }
 
         btnRegistro.setOnClickListener {
-            val nombre = etNombre.text.toString()
-            val fecha = etFecha.text.toString()
-            val pin = etPin.text.toString()
-            val pinConfirm = etPinConfirm.text.toString()
+            val nombre = etNombre.text.toString().trim()
+            val correo = etCorreo.text.toString().trim()
+            val cedula = etCedula.text.toString().trim()
+            val celular = etCelular.text.toString().trim()
+            val fecha = etFecha.text.toString().trim()
+            val pin = etPin.text.toString().trim()
+            val pinConfirm = etPinConfirm.text.toString().trim()
 
-            if (nombre.isEmpty() || fecha.isEmpty() || pin.isEmpty()) {
+            if (nombre.isEmpty() || correo.isEmpty() || cedula.isEmpty() || celular.isEmpty() || fecha.isEmpty() || pin.isEmpty()) {
                 Toast.makeText(this, "Por favor llena todos los campos", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
@@ -85,9 +88,51 @@ class RegisterActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            val intent = Intent(this, HomeActivity::class.java)
-            intent.putExtra("clave", nombre)
-            startActivity(intent)
+            if (pin.length != 4) {
+                Toast.makeText(this, "El PIN debe tener 4 dígitos", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            lifecycleScope.launch {
+                val result = withContext(Dispatchers.IO) {
+                    repository.registerUser(
+                        fullName = nombre,
+                        email = correo,
+                        documentNumber = cedula,
+                        phoneNumber = celular,
+                        birthDate = fecha,
+                        pin = pin
+                    )
+                }
+
+                result.fold(
+                    onSuccess = { userId ->
+                        SessionManager.save(this@RegisterActivity, userId, nombre, correo)
+                        getSharedPreferences("LoginPrefs", MODE_PRIVATE)
+                            .edit()
+                            .putString("user_mail", correo)
+                            .apply()
+
+                        val intent = Intent(this@RegisterActivity, HomeActivity::class.java)
+                        intent.putExtra("user_id", userId)
+                        intent.putExtra("user_name", nombre)
+                        startActivity(intent)
+                        finish()
+                    },
+                    onFailure = { error ->
+                        Toast.makeText(
+                            this@RegisterActivity,
+                            error.message ?: "No se pudo registrar el usuario",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                )
+            }
         }
+    }
+
+    override fun onSupportNavigateUp(): Boolean {
+        finish()
+        return true
     }
 }
