@@ -58,6 +58,10 @@ class HomeActivity : AppCompatActivity() {
         findViewById<LinearLayout>(R.id.ly_traumatologia).setOnClickListener { openDoctorFlow("Traumatología") }
         findViewById<LinearLayout>(R.id.ly_oftalmologia).setOnClickListener { openDoctorFlow("Oftalmología") }
         findViewById<LinearLayout>(R.id.ly_medicina).setOnClickListener { openDoctorFlow("Medicina General") }
+        findViewById<android.widget.ImageButton>(R.id.imgbtn_corazon).setOnClickListener { openDoctorFlow("Cardiología") }
+        findViewById<android.widget.ImageButton>(R.id.imageButton10).setOnClickListener { openDoctorFlow("Traumatología") }
+        findViewById<android.widget.ImageButton>(R.id.imageButton11).setOnClickListener { openDoctorFlow("Oftalmología") }
+        findViewById<android.widget.ImageButton>(R.id.imgbtn_medicinageneral).setOnClickListener { openDoctorFlow("Medicina General") }
 
         lifecycleScope.launch {
             refreshAppointmentUI(txtDoctora, txtEspecialidad, txtHoy, btnCancelar)
