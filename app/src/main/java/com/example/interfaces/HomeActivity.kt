@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Button
+import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
@@ -14,12 +15,11 @@ import androidx.lifecycle.lifecycleScope
 import com.example.interfaces.data.local.model.AppointmentSummary
 import com.example.interfaces.data.repository.VitusRepository
 import com.example.interfaces.data.session.SessionManager
+import com.example.interfaces.ui.booking.BookingUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
+import java.util.Calendar
 
 class HomeActivity : AppCompatActivity() {
     private val repository by lazy { VitusRepository.getInstance(applicationContext) }
@@ -47,16 +47,17 @@ class HomeActivity : AppCompatActivity() {
         val btnCancelar = findViewById<Button>(R.id.btn_cancelarcita)
         val btnEspecialidades = findViewById<Button>(R.id.btn_especialidades)
 
-        val sdf = SimpleDateFormat("EEEE, d 'de' MMMM", Locale("es", "EC"))
-        txtFecha.text = sdf.format(Date()).replaceFirstChar { it.uppercase() }
-
+        txtFecha.text = BookingUtils.todayDisplayDate()
         txtNombre.text = intent.getStringExtra("user_name")
             ?: SessionManager.getUserName(this)
 
         btnCancelar.setOnClickListener { confirmCancelNextAppointment() }
-        btnEspecialidades.setOnClickListener {
-            Toast.makeText(this, "Flujo de especialidades en la siguiente etapa", Toast.LENGTH_SHORT).show()
-        }
+        btnEspecialidades.setOnClickListener { openSpecialtyList() }
+
+        findViewById<LinearLayout>(R.id.ly_cardiologia).setOnClickListener { openDoctorFlow("Cardiología") }
+        findViewById<LinearLayout>(R.id.ly_traumatologia).setOnClickListener { openDoctorFlow("Traumatología") }
+        findViewById<LinearLayout>(R.id.ly_oftalmologia).setOnClickListener { openDoctorFlow("Oftalmología") }
+        findViewById<LinearLayout>(R.id.ly_medicina).setOnClickListener { openDoctorFlow("Medicina General") }
 
         lifecycleScope.launch {
             refreshAppointmentUI(txtDoctora, txtEspecialidad, txtHoy, btnCancelar)
@@ -84,8 +85,13 @@ class HomeActivity : AppCompatActivity() {
         }
 
         txtDoctora.text = appointment.doctorName
-        txtEspecialidad.text = "${appointment.specialtyName} - ${formatAppointmentDate(appointment.appointment.appointmentDate)} ${appointment.appointment.appointmentTime}"
-        txtHoy.text = appointment.appointment.status
+        txtEspecialidad.text = "${appointment.specialtyName} - ${BookingUtils.formatIsoDateForDisplay(appointment.appointment.appointmentDate)} ${appointment.appointment.appointmentTime}"
+        val todayIso = BookingUtils.toIsoDate(Calendar.getInstance())
+        txtHoy.text = if (appointment.appointment.appointmentDate == todayIso) {
+            "Hoy"
+        } else {
+            BookingUtils.formatIsoDateForDisplay(appointment.appointment.appointmentDate)
+        }
         btnCancelar.isEnabled = true
         btnCancelar.alpha = 1f
     }
@@ -116,14 +122,16 @@ class HomeActivity : AppCompatActivity() {
             .show()
     }
 
-    private fun formatAppointmentDate(rawDate: String): String {
-        return try {
-            val input = SimpleDateFormat("yyyy-MM-dd", Locale.US)
-            val output = SimpleDateFormat("d MMM", Locale("es", "EC"))
-            output.format(input.parse(rawDate) ?: Date())
-        } catch (_: Exception) {
-            rawDate
-        }
+    private fun openSpecialtyList() {
+        startActivity(Intent(this, SpecialtySelectionActivity::class.java).apply {
+            putExtra(SpecialtySelectionActivity.EXTRA_USER_NAME, SessionManager.getUserName(this@HomeActivity))
+        })
+    }
+
+    private fun openDoctorFlow(specialtyName: String) {
+        startActivity(Intent(this, DoctorSelectionActivity::class.java).apply {
+            putExtra(SpecialtySelectionActivity.EXTRA_SPECIALTY_NAME, specialtyName)
+        })
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -138,7 +146,7 @@ class HomeActivity : AppCompatActivity() {
                 true
             }
             R.id.li_cita -> {
-                Toast.makeText(this, "Agendamiento en desarrollo", Toast.LENGTH_SHORT).show()
+                openSpecialtyList()
                 true
             }
             R.id.li_salir -> {

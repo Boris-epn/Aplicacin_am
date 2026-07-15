@@ -9,6 +9,7 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
+        android:name=".VitusApp"
         android:supportsRtl="true"
         android:theme="@style/Theme.Interfaces">
         <activity
@@ -16,6 +17,26 @@
             android:exported="false"
             android:label="Vitus"
             android:parentActivityName=".LoginActivity" />
+        <activity
+            android:name=".ConfirmationActivity"
+            android:exported="false"
+            android:label="Confirmación"
+            android:parentActivityName=".SlotSelectionActivity" />
+        <activity
+            android:name=".SlotSelectionActivity"
+            android:exported="false"
+            android:label="Horarios"
+            android:parentActivityName=".DoctorSelectionActivity" />
+        <activity
+            android:name=".DoctorSelectionActivity"
+            android:exported="false"
+            android:label="Médicos"
+            android:parentActivityName=".SpecialtySelectionActivity" />
+        <activity
+            android:name=".SpecialtySelectionActivity"
+            android:exported="false"
+            android:label="Especialidades"
+            android:parentActivityName=".HomeActivity" />
         <activity
             android:name=".LoginActivity"
             android:exported="true"
