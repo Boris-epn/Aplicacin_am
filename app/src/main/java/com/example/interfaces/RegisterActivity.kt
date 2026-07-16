@@ -83,6 +83,26 @@ class RegisterActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
+            if (!android.util.Patterns.EMAIL_ADDRESS.matcher(correo).matches()) {
+                Toast.makeText(this, "Correo electrónico no válido", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            if (nombre.split(" ").filter { it.isNotEmpty() }.size < 2) {
+                Toast.makeText(this, "Ingrese al menos un nombre y un apellido", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            if (cedula.length != 10 || !cedula.all { it.isDigit() }) {
+                Toast.makeText(this, "La cédula debe tener 10 dígitos numéricos", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            if (celular.length != 10 || !celular.all { it.isDigit() }) {
+                Toast.makeText(this, "El celular debe tener 10 dígitos numéricos", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
             if (pin != pinConfirm) {
                 Toast.makeText(this, "Los PIN no coinciden", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener

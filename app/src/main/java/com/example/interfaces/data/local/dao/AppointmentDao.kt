@@ -96,4 +96,7 @@ interface AppointmentDao {
 
     @Query("UPDATE appointments SET status = :status WHERE id = :appointmentId")
     fun updateStatus(appointmentId: Long, status: String): Int
+
+    @Query("SELECT COUNT(*) FROM appointments WHERE user_id = :userId AND appointment_date = :appointmentDate AND appointment_time = :appointmentTime AND status = 'ACTIVA'")
+    fun countUserAppointmentsAt(userId: Long, appointmentDate: String, appointmentTime: String): Int
 }
