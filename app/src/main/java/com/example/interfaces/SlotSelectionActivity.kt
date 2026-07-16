@@ -1,15 +1,15 @@
 package com.example.interfaces
 
 import android.content.Intent
-import android.graphics.Color
 import android.os.Bundle
-import android.view.View
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.cardview.widget.CardView
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.interfaces.data.local.entity.DoctorEntity
 import com.example.interfaces.data.repository.VitusRepository
 import com.example.interfaces.data.session.SessionManager
@@ -17,13 +17,17 @@ import com.example.interfaces.ui.booking.BookingUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.util.Calendar
 
 class SlotSelectionActivity : AppCompatActivity() {
     private val repository by lazy { VitusRepository.getInstance(applicationContext) }
+    private val viewModel: SlotSelectionViewModel by viewModels {
+        SlotSelectionViewModel.Factory(applicationContext, SessionManager.getUserId(this))
+    }
+    
     private var doctor: DoctorEntity? = null
     private var specialtyName = ""
-    private var selectedSlot: Slot? = null
+    private var selectedSlot: SlotSelectionViewModel.Slot? = null
+    private lateinit var slotAdapter: SlotAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,112 +40,50 @@ class SlotSelectionActivity : AppCompatActivity() {
             return
         }
 
+        setupRecyclerView()
+
         findViewById<TextView>(R.id.btn_back).setOnClickListener { finish() }
         findViewById<Button>(R.id.btn_confirm).setOnClickListener { createAppointment() }
 
         lifecycleScope.launch {
             doctor = withContext(Dispatchers.IO) { repository.getDoctorById(doctorId) }
             val selectedDoctor = doctor ?: run { finish(); return@launch }
+            
             findViewById<TextView>(R.id.txt_doctor).text = selectedDoctor.fullName
             findViewById<TextView>(R.id.txt_specialty).text = if (specialtyName == "Medicina General") "Med. General" else specialtyName
             findViewById<TextView>(R.id.txt_initials).text = initialsFor(selectedDoctor.fullName)
-            bindSlots()
+            
+            viewModel.loadSlots(selectedDoctor)
+        }
+
+        observeViewModel()
+    }
+
+    private fun setupRecyclerView() {
+        slotAdapter = SlotAdapter { slot ->
+            selectedSlot = slot
+            findViewById<Button>(R.id.btn_confirm).text = "Confirmar: ${BookingUtils.formatIsoDateForDisplay(slot.date)} · ${slot.time}"
+        }
+        findViewById<RecyclerView>(R.id.rv_slots).apply {
+            layoutManager = LinearLayoutManager(this@SlotSelectionActivity)
+            adapter = slotAdapter
         }
     }
 
-    private fun bindSlots() {
+    private fun observeViewModel() {
         lifecycleScope.launch {
-            val selectedDoctor = doctor ?: return@launch
-            val calendar = Calendar.getInstance()
-            calendar.add(Calendar.DAY_OF_MONTH, 1)
-            val firstDate = BookingUtils.toIsoDate(calendar)
-            calendar.add(Calendar.DAY_OF_MONTH, 1)
-            val secondDate = BookingUtils.toIsoDate(calendar)
-
-            val potentialSlots = listOf(
-                Slot(firstDate, "08:30"), Slot(firstDate, "10:30"), Slot(firstDate, "11:30"), Slot(firstDate, "15:00"),
-                Slot(secondDate, "09:00"), Slot(secondDate, "11:00"), Slot(secondDate, "14:00"), Slot(secondDate, "16:00")
-            )
-
-            // Filtrar por horario del doctor y disponibilidad
-            val availableSlots = withContext(Dispatchers.IO) {
-                val userId = SessionManager.getUserId(this@SlotSelectionActivity)
-                potentialSlots.filter { slot ->
-                    val isWithinSchedule = isTimeInSchedule(slot.time, selectedDoctor.schedule)
-                    val isBooked = repository.getBookedTimesForDoctorAndDate(selectedDoctor.id, slot.date).contains(slot.time)
-                    val userConflict = if (userId != -1L) repository.hasAppointmentAt(userId, slot.date, slot.time) else false
-                    isWithinSchedule && !isBooked && !userConflict
-                }.take(5) // Solo tomamos hasta 5 para los 5 cards que tenemos en el layout
-            }
-
-            val cardIds = listOf(R.id.card_slot_one, R.id.card_slot_two, R.id.card_slot_three, R.id.card_slot_four, R.id.card_slot_five)
-            val dateIds = listOf(R.id.txt_date_one, R.id.txt_date_two, R.id.txt_date_three, R.id.txt_date_four, R.id.txt_date_five)
-            val timeIds = listOf(R.id.txt_time_one, R.id.txt_time_two, R.id.txt_time_three, R.id.txt_time_four, R.id.txt_time_five)
-            val statusIds = listOf(R.id.txt_status_one, R.id.txt_status_two, R.id.txt_status_three, R.id.txt_status_four, R.id.txt_status_five)
-
-            if (availableSlots.isEmpty()) {
-                Toast.makeText(this@SlotSelectionActivity, "No hay horarios disponibles próximamente", Toast.LENGTH_LONG).show()
-                return@launch
-            }
-
-            cardIds.forEachIndexed { index, cardId ->
-                val card = findViewById<CardView>(cardId)
-                if (index < availableSlots.size) {
-                    val slot = availableSlots[index]
-                    card.visibility = View.VISIBLE
-                    findViewById<TextView>(dateIds[index]).text = BookingUtils.formatIsoDateForDisplay(slot.date)
-                    findViewById<TextView>(timeIds[index]).text = slot.time
-                    findViewById<TextView>(statusIds[index]).text = ""
-                    card.setOnClickListener {
-                        selectSlot(slot, index, cardIds, dateIds, timeIds, statusIds, availableSlots.size)
+            viewModel.uiState.collect { state ->
+                when (state) {
+                    is SlotSelectionViewModel.SlotUiState.Loading -> { /* Mostrar progreso */ }
+                    is SlotSelectionViewModel.SlotUiState.Empty -> {
+                        Toast.makeText(this@SlotSelectionActivity, "No hay horarios disponibles", Toast.LENGTH_LONG).show()
                     }
-                } else {
-                    card.visibility = View.GONE
-                }
-            }
-            selectSlot(availableSlots.first(), 0, cardIds, dateIds, timeIds, statusIds, availableSlots.size)
-        }
-    }
-
-    private fun isTimeInSchedule(time: String, schedule: String): Boolean {
-        return try {
-            val times = Regex("(\\d{2}:\\d{2})").findAll(schedule).map { it.value }.toList()
-            if (times.size < 2) return true
-
-            val start = times.first().replace(":", "").toInt()
-            val end = times.last().replace(":", "").toInt()
-            val current = time.replace(":", "").toInt()
-
-            current in start..end
-        } catch (e: Exception) {
-            true
-        }
-    }
-
-    private fun selectSlot(
-        slot: Slot,
-        selectedIndex: Int,
-        cardIds: List<Int>,
-        dateIds: List<Int>,
-        timeIds: List<Int>,
-        statusIds: List<Int>,
-        availableSize: Int
-    ) {
-        selectedSlot = slot
-        cardIds.forEachIndexed { index, cardId ->
-            if (index < availableSize) {
-                val selected = index == selectedIndex
-                findViewById<CardView>(cardId).setCardBackgroundColor(Color.parseColor(if (selected) "#173B63" else "#FFFFFF"))
-                findViewById<TextView>(dateIds[index]).setTextColor(Color.parseColor(if (selected) "#FFFFFF" else "#17324F"))
-                findViewById<TextView>(timeIds[index]).setTextColor(Color.parseColor(if (selected) "#FFFFFF" else "#6F7782"))
-                findViewById<TextView>(statusIds[index]).apply {
-                    text = if (selected) "✓" else ""
-                    setTextColor(Color.WHITE)
-                    setBackgroundColor(Color.parseColor(if (selected) "#5E8F73" else "#FFFFFF"))
+                    is SlotSelectionViewModel.SlotUiState.Success -> {
+                        slotAdapter.submitList(state.slots)
+                    }
                 }
             }
         }
-        findViewById<Button>(R.id.btn_confirm).text = "Confirmar: ${BookingUtils.formatIsoDateForDisplay(slot.date)} · ${slot.time}"
     }
 
     private fun createAppointment() {
@@ -163,7 +105,7 @@ class SlotSelectionActivity : AppCompatActivity() {
             .show()
     }
 
-    private fun proceedWithBooking(userId: Long, selectedDoctor: DoctorEntity, slot: Slot) {
+    private fun proceedWithBooking(userId: Long, selectedDoctor: DoctorEntity, slot: SlotSelectionViewModel.Slot) {
         lifecycleScope.launch {
             val specialty = withContext(Dispatchers.IO) {
                 repository.getSpecialties().firstOrNull { it.name == specialtyName }
@@ -197,8 +139,6 @@ class SlotSelectionActivity : AppCompatActivity() {
 
     private fun initialsFor(name: String): String = name.replace("Dra. ", "").replace("Dr. ", "")
         .split(" ").take(2).joinToString("") { it.first().toString() }
-
-    private data class Slot(val date: String, val time: String)
 
     companion object {
         const val EXTRA_SPECIALTY_NAME = "specialty_name"

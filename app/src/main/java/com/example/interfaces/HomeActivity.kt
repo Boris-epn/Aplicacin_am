@@ -19,7 +19,8 @@ import com.example.interfaces.ui.booking.BookingUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.util.Calendar
+import java.time.LocalDate
+import java.util.*
 
 class HomeActivity : AppCompatActivity() {
     private val repository by lazy { VitusRepository.getInstance(applicationContext) }
@@ -90,7 +91,7 @@ class HomeActivity : AppCompatActivity() {
 
         txtDoctora.text = appointment.doctorName
         txtEspecialidad.text = "${appointment.specialtyName} - ${BookingUtils.formatIsoDateForDisplay(appointment.appointment.appointmentDate)} ${appointment.appointment.appointmentTime}"
-        val todayIso = BookingUtils.toIsoDate(Calendar.getInstance())
+        val todayIso = LocalDate.now().toString()
         txtHoy.text = if (appointment.appointment.appointmentDate == todayIso) {
             "Hoy"
         } else {

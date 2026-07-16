@@ -24,6 +24,6 @@
             </LinearLayout>
         </androidx.cardview.widget.CardView>
         <Button android:id="@+id/btn_home" android:layout_width="match_parent" android:layout_height="52dp" android:layout_marginTop="24dp" android:backgroundTint="#5E8F73" android:text="Volver al inicio" android:textColor="#FFFFFF" android:textStyle="bold" />
-        <TextView android:id="@+id/btn_calendar" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="14dp" android:layout_marginBottom="18dp" android:text="Agregar al calendario" android:textColor="#5E8F73" android:textSize="14sp" />
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="14dp" android:layout_marginBottom="18dp" android:text="Cita registrada en el sistema de Vitus" android:textColor="#6F7782" android:textSize="13sp" />
     </LinearLayout>
 </ScrollView>
