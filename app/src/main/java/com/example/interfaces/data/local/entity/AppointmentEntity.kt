@@ -5,6 +5,8 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import java.time.LocalDate
+import java.time.LocalTime
 
 @Entity(
     tableName = "appointments",
@@ -40,9 +42,9 @@ data class AppointmentEntity(
     @ColumnInfo(name = "doctor_id")
     val doctorId: Long,
     @ColumnInfo(name = "appointment_date")
-    val appointmentDate: String,
+    val appointmentDate: LocalDate,
     @ColumnInfo(name = "appointment_time")
-    val appointmentTime: String,
+    val appointmentTime: LocalTime,
     val room: String,
     val status: String,
     val reason: String,

@@ -6,6 +6,8 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.example.interfaces.data.local.entity.AppointmentEntity
 import com.example.interfaces.data.local.model.AppointmentSummary
+import java.time.LocalDate
+import java.time.LocalTime
 
 @Dao
 interface AppointmentDao {
@@ -92,11 +94,11 @@ interface AppointmentDao {
         ORDER BY appointment_time ASC
         """
     )
-    fun getBookedTimesForDoctorAndDate(doctorId: Long, appointmentDate: String): List<String>
+    fun getBookedTimesForDoctorAndDate(doctorId: Long, appointmentDate: LocalDate): List<LocalTime>
 
     @Query("UPDATE appointments SET status = :status WHERE id = :appointmentId")
     fun updateStatus(appointmentId: Long, status: String): Int
 
     @Query("SELECT COUNT(*) FROM appointments WHERE user_id = :userId AND appointment_date = :appointmentDate AND appointment_time = :appointmentTime AND status = 'ACTIVA'")
-    fun countUserAppointmentsAt(userId: Long, appointmentDate: String, appointmentTime: String): Int
+    fun countUserAppointmentsAt(userId: Long, appointmentDate: LocalDate, appointmentTime: LocalTime): Int
 }

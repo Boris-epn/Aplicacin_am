@@ -27,8 +27,8 @@ class ConfirmationActivity : AppCompatActivity() {
             val appointment = summary ?: return@launch
             findViewById<TextView>(R.id.txt_specialty).text = if (appointment.specialtyName == "Medicina General") "Med. General" else appointment.specialtyName
             findViewById<TextView>(R.id.txt_doctor).text = appointment.doctorName
-            findViewById<TextView>(R.id.txt_date).text = BookingUtils.formatIsoDateForDisplay(appointment.appointment.appointmentDate)
-            findViewById<TextView>(R.id.txt_time).text = appointment.appointment.appointmentTime
+            findViewById<TextView>(R.id.txt_date).text = BookingUtils.formatDateForDisplay(appointment.appointment.appointmentDate)
+            findViewById<TextView>(R.id.txt_time).text = BookingUtils.formatTimeForDisplay(appointment.appointment.appointmentTime)
             findViewById<TextView>(R.id.txt_room).text = appointment.appointment.room
         }
     }

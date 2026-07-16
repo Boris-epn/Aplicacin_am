@@ -5,6 +5,8 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import java.time.DayOfWeek
+import java.time.LocalTime
 
 @Entity(
     tableName = "doctors",
@@ -24,7 +26,9 @@ data class DoctorEntity(
     val fullName: String,
     @ColumnInfo(name = "specialty_id")
     val specialtyId: Long,
-    val schedule: String,
+    val workDays: Set<DayOfWeek>,
+    val startTime: LocalTime,
+    val endTime: LocalTime,
     @ColumnInfo(name = "consultation_room")
     val consultationRoom: String,
     val phone: String,

@@ -8,7 +8,9 @@ import com.example.interfaces.data.local.entity.DoctorEntity
 import com.example.interfaces.data.local.entity.SpecialtyEntity
 import com.example.interfaces.data.local.entity.UserEntity
 import com.example.interfaces.data.local.model.AppointmentSummary
-import java.util.Calendar
+import java.time.DayOfWeek
+import java.time.LocalDate
+import java.time.LocalTime
 import java.util.Locale
 
 class VitusRepository private constructor(context: Context) {
@@ -72,7 +74,7 @@ class VitusRepository private constructor(context: Context) {
         return appointmentDao.getSummaryById(appointmentId)
     }
 
-    suspend fun getBookedTimesForDoctorAndDate(doctorId: Long, appointmentDate: String): List<String> {
+    suspend fun getBookedTimesForDoctorAndDate(doctorId: Long, appointmentDate: LocalDate): List<LocalTime> {
         ensureSeedData()
         return appointmentDao.getBookedTimesForDoctorAndDate(doctorId, appointmentDate)
     }
@@ -106,8 +108,8 @@ class VitusRepository private constructor(context: Context) {
         userId: Long,
         specialtyId: Long,
         doctorId: Long,
-        appointmentDate: String,
-        appointmentTime: String,
+        appointmentDate: LocalDate,
+        appointmentTime: LocalTime,
         room: String,
         reason: String
     ): Long {
@@ -126,7 +128,7 @@ class VitusRepository private constructor(context: Context) {
         )
     }
 
-    suspend fun hasAppointmentAt(userId: Long, date: String, time: String): Boolean {
+    suspend fun hasAppointmentAt(userId: Long, date: LocalDate, time: LocalTime): Boolean {
         ensureSeedData()
         return appointmentDao.countUserAppointmentsAt(userId, date, time) > 0
     }
@@ -177,11 +179,19 @@ class VitusRepository private constructor(context: Context) {
     }
 
     private suspend fun ensureDoctorsSeeded(specialtyIds: Map<String, Long>): Map<String, Long> {
+        val lunVie = setOf(DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY, DayOfWeek.FRIDAY)
+        val lunSab = lunVie + DayOfWeek.SATURDAY
+        val marVie = setOf(DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY, DayOfWeek.FRIDAY)
+        val lunJue = setOf(DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY)
+        val todosLosDias = DayOfWeek.entries.toSet()
+
         val items = listOf(
             DoctorEntity(
                 fullName = "Dra. Ana Ríos",
                 specialtyId = specialtyIds.getValue("Cardiología"),
-                schedule = "Lun a Vie 08:00 - 12:00",
+                workDays = lunVie,
+                startTime = LocalTime.of(8, 0),
+                endTime = LocalTime.of(12, 0),
                 consultationRoom = "Consultorio 301",
                 phone = "1800-VITUS",
                 photoRes = R.drawable.heart
@@ -189,7 +199,9 @@ class VitusRepository private constructor(context: Context) {
             DoctorEntity(
                 fullName = "Dr. Luis Torres",
                 specialtyId = specialtyIds.getValue("Cardiología"),
-                schedule = "Lun a Sáb 14:00 - 18:00",
+                workDays = lunSab,
+                startTime = LocalTime.of(14, 0),
+                endTime = LocalTime.of(18, 0),
                 consultationRoom = "Consultorio 302",
                 phone = "1800-VITUS",
                 photoRes = R.drawable.heart
@@ -197,7 +209,9 @@ class VitusRepository private constructor(context: Context) {
             DoctorEntity(
                 fullName = "Dra. Sofía Paredes",
                 specialtyId = specialtyIds.getValue("Traumatología"),
-                schedule = "Mar a Vie 09:00 - 13:00",
+                workDays = marVie,
+                startTime = LocalTime.of(9, 0),
+                endTime = LocalTime.of(13, 0),
                 consultationRoom = "Consultorio 210",
                 phone = "1800-VITUS",
                 photoRes = R.drawable.bone
@@ -205,7 +219,9 @@ class VitusRepository private constructor(context: Context) {
             DoctorEntity(
                 fullName = "Dr. Marco Suárez",
                 specialtyId = specialtyIds.getValue("Traumatología"),
-                schedule = "Lun a Jue 15:00 - 19:00",
+                workDays = lunJue,
+                startTime = LocalTime.of(15, 0),
+                endTime = LocalTime.of(19, 0),
                 consultationRoom = "Consultorio 211",
                 phone = "1800-VITUS",
                 photoRes = R.drawable.bone
@@ -213,7 +229,9 @@ class VitusRepository private constructor(context: Context) {
             DoctorEntity(
                 fullName = "Dra. Valeria Mena",
                 specialtyId = specialtyIds.getValue("Oftalmología"),
-                schedule = "Lun a Vie 10:00 - 14:00",
+                workDays = lunVie,
+                startTime = LocalTime.of(10, 0),
+                endTime = LocalTime.of(14, 0),
                 consultationRoom = "Consultorio 118",
                 phone = "1800-VITUS",
                 photoRes = R.drawable.eye
@@ -221,7 +239,9 @@ class VitusRepository private constructor(context: Context) {
             DoctorEntity(
                 fullName = "Dr. Carlos Vega",
                 specialtyId = specialtyIds.getValue("Medicina General"),
-                schedule = "Todos los días 08:00 - 16:00",
+                workDays = todosLosDias,
+                startTime = LocalTime.of(8, 0),
+                endTime = LocalTime.of(16, 0),
                 consultationRoom = "Consultorio 101",
                 phone = "1800-VITUS",
                 photoRes = R.drawable.medicine
@@ -229,7 +249,9 @@ class VitusRepository private constructor(context: Context) {
             DoctorEntity(
                 fullName = "Dra. Paula Ruiz",
                 specialtyId = specialtyIds.getValue("Neurología"),
-                schedule = "Lun a Vie 09:00 - 13:00",
+                workDays = lunVie,
+                startTime = LocalTime.of(9, 0),
+                endTime = LocalTime.of(13, 0),
                 consultationRoom = "Consultorio 220",
                 phone = "1800-VITUS",
                 photoRes = R.drawable.brain
@@ -237,7 +259,9 @@ class VitusRepository private constructor(context: Context) {
             DoctorEntity(
                 fullName = "Dr. Mateo León",
                 specialtyId = specialtyIds.getValue("Geriatría"),
-                schedule = "Lun a Vie 08:00 - 12:00",
+                workDays = lunVie,
+                startTime = LocalTime.of(8, 0),
+                endTime = LocalTime.of(12, 0),
                 consultationRoom = "Consultorio 120",
                 phone = "1800-VITUS",
                 photoRes = R.drawable.geriatria

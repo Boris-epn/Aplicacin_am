@@ -1,10 +1,12 @@
 package com.example.interfaces
 
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Button
+import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
@@ -12,6 +14,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import com.example.interfaces.data.local.entity.SpecialtyEntity
 import com.example.interfaces.data.local.model.AppointmentSummary
 import com.example.interfaces.data.repository.VitusRepository
 import com.example.interfaces.data.session.SessionManager
@@ -20,7 +23,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.time.LocalDate
-import java.util.*
 
 class HomeActivity : AppCompatActivity() {
     private val repository by lazy { VitusRepository.getInstance(applicationContext) }
@@ -67,6 +69,27 @@ class HomeActivity : AppCompatActivity() {
         lifecycleScope.launch {
             refreshAppointmentUI(txtDoctora, txtEspecialidad, txtHoy, btnCancelar)
         }
+        lifecycleScope.launch {
+            val specialties = withContext(Dispatchers.IO) { repository.getSpecialties() }
+            bindHomeSpecialtyCards(specialties)
+        }
+    }
+
+    private fun bindHomeSpecialtyCards(specialties: List<SpecialtyEntity>) {
+        val slots = listOf(
+            Triple("Cardiología", R.id.imgbtn_corazon, R.id.txt_cardiologia),
+            Triple("Traumatología", R.id.imageButton10, R.id.textView10),
+            Triple("Oftalmología", R.id.imageButton11, R.id.textView11),
+            Triple("Medicina General", R.id.imgbtn_medicinageneral, R.id.textView12)
+        )
+        slots.forEach { (name, imageButtonId, labelId) ->
+            val specialty = specialties.firstOrNull { it.name == name } ?: return@forEach
+            findViewById<ImageButton>(imageButtonId).setImageResource(specialty.iconRes)
+            findViewById<TextView>(labelId).apply {
+                text = specialty.name
+                setTextColor(Color.parseColor(specialty.colorHex))
+            }
+        }
     }
 
     private suspend fun refreshAppointmentUI(
@@ -90,12 +113,11 @@ class HomeActivity : AppCompatActivity() {
         }
 
         txtDoctora.text = appointment.doctorName
-        txtEspecialidad.text = "${appointment.specialtyName} - ${BookingUtils.formatIsoDateForDisplay(appointment.appointment.appointmentDate)} ${appointment.appointment.appointmentTime}"
-        val todayIso = LocalDate.now().toString()
-        txtHoy.text = if (appointment.appointment.appointmentDate == todayIso) {
+        txtEspecialidad.text = "${appointment.specialtyName} - ${BookingUtils.formatDateForDisplay(appointment.appointment.appointmentDate)} ${BookingUtils.formatTimeForDisplay(appointment.appointment.appointmentTime)}"
+        txtHoy.text = if (appointment.appointment.appointmentDate == LocalDate.now()) {
             "Hoy"
         } else {
-            BookingUtils.formatIsoDateForDisplay(appointment.appointment.appointmentDate)
+            BookingUtils.formatDateForDisplay(appointment.appointment.appointmentDate)
         }
         btnCancelar.isEnabled = true
         btnCancelar.alpha = 1f

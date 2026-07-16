@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.TypeConverters
 import com.example.interfaces.data.local.dao.AppointmentDao
 import com.example.interfaces.data.local.dao.DoctorDao
 import com.example.interfaces.data.local.dao.SpecialtyDao
@@ -20,9 +21,10 @@ import com.example.interfaces.data.local.entity.UserEntity
         DoctorEntity::class,
         AppointmentEntity::class
     ],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
+@TypeConverters(Converters::class)
 abstract class VitusDatabase : RoomDatabase() {
     abstract fun userDao(): UserDao
     abstract fun specialtyDao(): SpecialtyDao
@@ -39,7 +41,7 @@ abstract class VitusDatabase : RoomDatabase() {
                     context.applicationContext,
                     VitusDatabase::class.java,
                     "vitus_database"
-                ).build().also { INSTANCE = it }
+                ).fallbackToDestructiveMigration().build().also { INSTANCE = it }
             }
         }
     }

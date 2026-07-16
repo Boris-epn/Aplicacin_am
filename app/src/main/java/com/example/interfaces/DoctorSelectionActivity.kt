@@ -11,9 +11,11 @@ import androidx.cardview.widget.CardView
 import androidx.lifecycle.lifecycleScope
 import com.example.interfaces.data.local.entity.DoctorEntity
 import com.example.interfaces.data.repository.VitusRepository
+import com.example.interfaces.ui.booking.BookingUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.time.DayOfWeek
 
 class DoctorSelectionActivity : AppCompatActivity() {
     private val repository by lazy { VitusRepository.getInstance(applicationContext) }
@@ -55,7 +57,7 @@ class DoctorSelectionActivity : AppCompatActivity() {
             card.visibility = if (doctor == null) View.GONE else View.VISIBLE
             if (doctor != null) {
                 findViewById<TextView>(names[index]).text = doctor.fullName
-                findViewById<TextView>(schedules[index]).text = doctor.schedule
+                findViewById<TextView>(schedules[index]).text = formatSchedule(doctor)
                 findViewById<TextView>(initials[index]).text = initialsFor(doctor.fullName)
                 card.setOnClickListener { selectDoctor(doctor, index) }
             }
@@ -85,6 +87,23 @@ class DoctorSelectionActivity : AppCompatActivity() {
             putExtra(SlotSelectionActivity.EXTRA_SPECIALTY_NAME, specialtyName)
             putExtra(SlotSelectionActivity.EXTRA_DOCTOR_ID, doctor.id)
         })
+    }
+
+    private fun formatSchedule(doctor: DoctorEntity): String {
+        val dayLabels = mapOf(
+            DayOfWeek.MONDAY to "Lun", DayOfWeek.TUESDAY to "Mar", DayOfWeek.WEDNESDAY to "Mié",
+            DayOfWeek.THURSDAY to "Jue", DayOfWeek.FRIDAY to "Vie", DayOfWeek.SATURDAY to "Sáb",
+            DayOfWeek.SUNDAY to "Dom"
+        )
+        val sortedDays = doctor.workDays.sorted()
+        val dayValues = sortedDays.map { it.value }
+        val isContiguous = dayValues == (dayValues.first()..dayValues.last()).toList()
+        val daysText = when {
+            sortedDays.size == 7 -> "Todos los días"
+            isContiguous -> "${dayLabels.getValue(sortedDays.first())} a ${dayLabels.getValue(sortedDays.last())}"
+            else -> sortedDays.joinToString(", ") { dayLabels.getValue(it) }
+        }
+        return "$daysText ${BookingUtils.formatTimeForDisplay(doctor.startTime)} - ${BookingUtils.formatTimeForDisplay(doctor.endTime)}"
     }
 
     private fun initialsFor(name: String): String {

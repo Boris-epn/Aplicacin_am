@@ -18,27 +18,14 @@
         android:orientation="horizontal"
         android:paddingHorizontal="16dp">
 
-        <LinearLayout
+        <TextView
+            android:id="@+id/txt_time"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/txt_date"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="#17324F"
-                android:textSize="16sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/txt_time"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="#6F7782"
-                android:textSize="13sp" />
-        </LinearLayout>
+            android:textColor="#17324F"
+            android:textSize="16sp"
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/txt_status"
