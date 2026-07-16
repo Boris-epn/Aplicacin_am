@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#E9EAED"
+    android:fillViewport="true">
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_margin="8dp" android:background="#FCFBF7" android:gravity="center_horizontal" android:orientation="vertical" android:padding="18dp">
+        <View android:layout_width="match_parent" android:layout_height="4dp" android:background="#5E8F73" />
+        <TextView android:layout_width="70dp" android:layout_height="70dp" android:layout_marginTop="28dp" android:background="#5E8F73" android:gravity="center" android:text="✓" android:textColor="#FFFFFF" android:textSize="40sp" />
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="24dp" android:gravity="center" android:text="¡Cita agendada!" android:textColor="#17324F" android:textSize="27sp" android:textStyle="bold" />
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="10dp" android:gravity="center" android:text="Le enviaremos un SMS el día anterior.\n¡Que se mejore!" android:textColor="#6F7782" android:textSize="14sp" />
+        <androidx.cardview.widget.CardView android:id="@+id/card_appointment_summary" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="26dp" app:cardBackgroundColor="#FFFFFF" app:cardCornerRadius="20dp" app:cardElevation="0dp">
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="16dp">
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"><TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Especialidad" android:textColor="#6F7782" android:textSize="14sp" /><TextView android:id="@+id/txt_specialty" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textColor="#17324F" android:textSize="14sp" android:textStyle="bold" /></LinearLayout>
+                <View android:layout_width="match_parent" android:layout_height="1dp" android:layout_marginVertical="12dp" android:background="#ECEDEC" />
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"><TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Médico" android:textColor="#6F7782" android:textSize="14sp" /><TextView android:id="@+id/txt_doctor" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textColor="#17324F" android:textSize="14sp" android:textStyle="bold" /></LinearLayout>
+                <View android:layout_width="match_parent" android:layout_height="1dp" android:layout_marginVertical="12dp" android:background="#ECEDEC" />
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"><TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Fecha" android:textColor="#6F7782" android:textSize="14sp" /><TextView android:id="@+id/txt_date" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textColor="#17324F" android:textSize="14sp" android:textStyle="bold" /></LinearLayout>
+                <View android:layout_width="match_parent" android:layout_height="1dp" android:layout_marginVertical="12dp" android:background="#ECEDEC" />
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"><TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Hora" android:textColor="#6F7782" android:textSize="14sp" /><TextView android:id="@+id/txt_time" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textColor="#17324F" android:textSize="14sp" android:textStyle="bold" /></LinearLayout>
+                <View android:layout_width="match_parent" android:layout_height="1dp" android:layout_marginVertical="12dp" android:background="#ECEDEC" />
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"><TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Consultorio" android:textColor="#6F7782" android:textSize="14sp" /><TextView android:id="@+id/txt_room" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textColor="#17324F" android:textSize="14sp" android:textStyle="bold" /></LinearLayout>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+        <Button android:id="@+id/btn_home" android:layout_width="match_parent" android:layout_height="52dp" android:layout_marginTop="24dp" android:backgroundTint="#5E8F73" android:text="Volver al inicio" android:textColor="#FFFFFF" android:textStyle="bold" />
+        <TextView android:id="@+id/btn_calendar" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="14dp" android:layout_marginBottom="18dp" android:text="Agregar al calendario" android:textColor="#5E8F73" android:textSize="14sp" />
+    </LinearLayout>
+</ScrollView>

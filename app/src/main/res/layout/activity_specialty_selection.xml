@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#E9EAED"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        android:background="#FCFBF7"
+        android:orientation="vertical"
+        android:padding="18dp">
+
+        <TextView
+            android:id="@+id/btn_back"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="← Volver"
+            android:textColor="#5E8F73"
+            android:textSize="15sp" />
+
+        <TextView
+            android:id="@+id/txt_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="22dp"
+            android:text="¿Qué tipo de cita necesita, Juana?"
+            android:textColor="#17324F"
+            android:textSize="25sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="16dp"
+            android:text="Toque la especialidad."
+            android:textColor="#6F7782"
+            android:textSize="14sp" />
+
+        <androidx.cardview.widget.CardView android:id="@+id/card_cardiology" android:layout_width="match_parent" android:layout_height="64dp" android:layout_marginBottom="10dp" android:clickable="true" android:foreground="?android:attr/selectableItemBackground" android:focusable="true" app:cardBackgroundColor="#FCE6E7" app:cardCornerRadius="16dp" app:cardElevation="0dp">
+            <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent" android:gravity="center_vertical" android:orientation="horizontal" android:paddingHorizontal="14dp">
+                <ImageView android:layout_width="42dp" android:layout_height="42dp" android:background="#F7D1D4" android:contentDescription="Cardiología" android:padding="9dp" android:scaleType="centerInside" app:srcCompat="@drawable/corazon" />
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_marginStart="12dp" android:layout_weight="1" android:orientation="vertical"><TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Cardiología" android:textColor="#C53030" android:textSize="18sp" android:textStyle="bold" /><TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Corazón · Circulación" android:textColor="#A95353" android:textSize="13sp" /></LinearLayout>
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="›" android:textColor="#C53030" android:textSize="25sp" />
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView android:id="@+id/card_traumatology" android:layout_width="match_parent" android:layout_height="64dp" android:layout_marginBottom="10dp" android:clickable="true" android:foreground="?android:attr/selectableItemBackground" android:focusable="true" app:cardBackgroundColor="#E2EFFD" app:cardCornerRadius="16dp" app:cardElevation="0dp">
+            <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent" android:gravity="center_vertical" android:orientation="horizontal" android:paddingHorizontal="14dp"><ImageView android:layout_width="42dp" android:layout_height="42dp" android:background="#CFE2F7" android:contentDescription="Traumatología" android:padding="9dp" android:scaleType="centerInside" app:srcCompat="@drawable/hueso" /><LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_marginStart="12dp" android:layout_weight="1" android:orientation="vertical"><TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Traumatología" android:textColor="#28569B" android:textSize="18sp" android:textStyle="bold" /><TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Huesos · Articulaciones" android:textColor="#496C9D" android:textSize="13sp" /></LinearLayout><TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="›" android:textColor="#28569B" android:textSize="25sp" /></LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView android:id="@+id/card_ophthalmology" android:layout_width="match_parent" android:layout_height="64dp" android:layout_marginBottom="10dp" android:clickable="true" android:foreground="?android:attr/selectableItemBackground" android:focusable="true" app:cardBackgroundColor="#F1E4FC" app:cardCornerRadius="16dp" app:cardElevation="0dp">
+            <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent" android:gravity="center_vertical" android:orientation="horizontal" android:paddingHorizontal="14dp"><ImageView android:layout_width="42dp" android:layout_height="42dp" android:background="#E4D1F6" android:contentDescription="Oftalmología" android:padding="9dp" android:scaleType="centerInside" app:srcCompat="@drawable/ojo" /><LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_marginStart="12dp" android:layout_weight="1" android:orientation="vertical"><TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Oftalmología" android:textColor="#71389D" android:textSize="18sp" android:textStyle="bold" /><TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Visión · Retina" android:textColor="#80559E" android:textSize="13sp" /></LinearLayout><TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="›" android:textColor="#71389D" android:textSize="25sp" /></LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView android:id="@+id/card_general_medicine" android:layout_width="match_parent" android:layout_height="64dp" android:layout_marginBottom="10dp" android:clickable="true" android:foreground="?android:attr/selectableItemBackground" android:focusable="true" app:cardBackgroundColor="#E7F0EB" app:cardCornerRadius="16dp" app:cardElevation="0dp">
+            <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent" android:gravity="center_vertical" android:orientation="horizontal" android:paddingHorizontal="14dp"><TextView android:layout_width="42dp" android:layout_height="42dp" android:background="#D7E6DC" android:gravity="center" android:text="⚕" android:textColor="#5E8F73" android:textSize="25sp" /><LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_marginStart="12dp" android:layout_weight="1" android:orientation="vertical"><TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Med. General" android:textColor="#5E8F73" android:textSize="18sp" android:textStyle="bold" /><TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Control · Prevención" android:textColor="#678477" android:textSize="13sp" /></LinearLayout><TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="›" android:textColor="#5E8F73" android:textSize="25sp" /></LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView android:id="@+id/card_neurology" android:layout_width="match_parent" android:layout_height="64dp" android:layout_marginBottom="10dp" android:clickable="true" android:foreground="?android:attr/selectableItemBackground" android:focusable="true" app:cardBackgroundColor="#FFF2C9" app:cardCornerRadius="16dp" app:cardElevation="0dp">
+            <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent" android:gravity="center_vertical" android:orientation="horizontal" android:paddingHorizontal="14dp"><ImageView android:layout_width="42dp" android:layout_height="42dp" android:background="#F6E2AB" android:contentDescription="Neurología" android:padding="7dp" android:scaleType="centerInside" app:srcCompat="@drawable/ic_neurologia" /><LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_marginStart="12dp" android:layout_weight="1" android:orientation="vertical"><TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Neurología" android:textColor="#9B591C" android:textSize="18sp" android:textStyle="bold" /><TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Cerebro · Sistema nervioso" android:textColor="#9B6C36" android:textSize="13sp" /></LinearLayout><TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="›" android:textColor="#9B591C" android:textSize="25sp" /></LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView android:id="@+id/card_geriatrics" android:layout_width="match_parent" android:layout_height="64dp" android:clickable="true" android:foreground="?android:attr/selectableItemBackground" android:focusable="true" app:cardBackgroundColor="#D4F8E3" app:cardCornerRadius="16dp" app:cardElevation="0dp">
+            <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent" android:gravity="center_vertical" android:orientation="horizontal" android:paddingHorizontal="14dp"><TextView android:layout_width="42dp" android:layout_height="42dp" android:background="#BFEED3" android:gravity="center" android:text="♟" android:textColor="#087452" android:textSize="23sp" /><LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_marginStart="12dp" android:layout_weight="1" android:orientation="vertical"><TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Geriatría" android:textColor="#087452" android:textSize="18sp" android:textStyle="bold" /><TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Salud integral · Adulto mayor" android:textColor="#28765B" android:textSize="13sp" /></LinearLayout><TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="›" android:textColor="#087452" android:textSize="25sp" /></LinearLayout>
+        </androidx.cardview.widget.CardView>
+    </LinearLayout>
+</ScrollView>
