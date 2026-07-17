@@ -54,6 +54,8 @@ class SlotSelectionActivity : AppCompatActivity() {
 
         findViewById<TextView>(R.id.btn_back).setOnClickListener { finish() }
         findViewById<Button>(R.id.btn_confirm).setOnClickListener { createAppointment() }
+        findViewById<TextView>(R.id.btn_prev_week).setOnClickListener { viewModel.previousWeek() }
+        findViewById<TextView>(R.id.btn_next_week).setOnClickListener { viewModel.nextWeek() }
 
         lifecycleScope.launch {
             doctor = withContext(Dispatchers.IO) { repository.getDoctorById(doctorId) }
@@ -85,6 +87,13 @@ class SlotSelectionActivity : AppCompatActivity() {
             viewModel.dayOptions.collect { days -> bindDayStrip(days) }
         }
         lifecycleScope.launch {
+            viewModel.weekState.collect { week ->
+                findViewById<TextView>(R.id.txt_week_label).text = week.label
+                bindWeekArrow(R.id.btn_prev_week, week.canGoPrev)
+                bindWeekArrow(R.id.btn_next_week, week.canGoNext)
+            }
+        }
+        lifecycleScope.launch {
             viewModel.timeState.collect { state ->
                 when (state) {
                     is SlotSelectionViewModel.TimeUiState.Loading -> { /* Mostrar progreso */ }
@@ -99,6 +108,14 @@ class SlotSelectionActivity : AppCompatActivity() {
                 }
                 updateConfirmButtonText()
             }
+        }
+    }
+
+    /** Se atenúa en vez de ocultarse para que la fila no salte al llegar a un límite. */
+    private fun bindWeekArrow(arrowId: Int, enabled: Boolean) {
+        findViewById<TextView>(arrowId).apply {
+            isEnabled = enabled
+            alpha = if (enabled) 1f else 0.35f
         }
     }
 

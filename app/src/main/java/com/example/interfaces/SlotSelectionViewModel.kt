@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.interfaces.data.local.entity.DoctorEntity
 import com.example.interfaces.data.repository.VitusRepository
+import com.example.interfaces.ui.booking.BookingUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -14,6 +15,7 @@ import kotlinx.coroutines.withContext
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.LocalTime
+import java.time.temporal.TemporalAdjusters
 
 class SlotSelectionViewModel(
     private val repository: VitusRepository,
@@ -28,16 +30,50 @@ class SlotSelectionViewModel(
     private val _timeState = MutableStateFlow<TimeUiState>(TimeUiState.Loading)
     val timeState: StateFlow<TimeUiState> = _timeState
 
+    private val _weekState = MutableStateFlow(WeekState("", canGoPrev = false, canGoNext = false))
+    val weekState: StateFlow<WeekState> = _weekState
+
+    private var weekOffset = 0
+
     var selectedDate: LocalDate? = null
         private set
 
-    /** Cinta de 5 días hábiles: cálculo de calendario puro, no toca la BD. */
     fun loadDayStrip(doctor: DoctorEntity) {
         this.doctor = doctor
-        val days = generateBusinessDayStrip().map { date ->
-            DayOption(date = date, enabled = doctor.workDays.contains(date.dayOfWeek), selected = false)
+        renderWeek()
+    }
+
+    fun previousWeek() {
+        if (weekOffset == 0) return
+        weekOffset--
+        renderWeek()
+    }
+
+    fun nextWeek() {
+        if (weekOffset == MAX_WEEK_OFFSET) return
+        weekOffset++
+        renderWeek()
+    }
+
+    /** Cinta de lunes a viernes de la semana actual: cálculo de calendario puro, no toca la BD. */
+    private fun renderWeek() {
+        if (!::doctor.isInitialized) return
+        val today = LocalDate.now()
+        val dates = generateBusinessDayStrip()
+        val days = dates.map { date ->
+            DayOption(
+                date = date,
+                // Un día pasado sigue siendo laborable, pero ya no se puede agendar en él.
+                enabled = doctor.workDays.contains(date.dayOfWeek) && !date.isBefore(today),
+                selected = false
+            )
         }
         _dayOptions.value = days
+        _weekState.value = WeekState(
+            label = BookingUtils.formatWeekLabel(dates.first(), dates.last()),
+            canGoPrev = weekOffset > 0,
+            canGoNext = weekOffset < MAX_WEEK_OFFSET
+        )
 
         val firstEnabled = days.firstOrNull { it.enabled }
         if (firstEnabled != null) {
@@ -49,15 +85,22 @@ class SlotSelectionViewModel(
     }
 
     private fun generateBusinessDayStrip(): List<LocalDate> {
-        val days = mutableListOf<LocalDate>()
-        var cursor = LocalDate.now()
-        while (days.size < 5) {
-            if (cursor.dayOfWeek != DayOfWeek.SATURDAY && cursor.dayOfWeek != DayOfWeek.SUNDAY) {
-                days.add(cursor)
-            }
-            cursor = cursor.plusDays(1)
+        val monday = referenceMonday().plusWeeks(weekOffset.toLong())
+        return (0L..4L).map { monday.plusDays(it) }
+    }
+
+    /**
+     * Lunes de la semana 0. En sábado o domingo salta al lunes siguiente: de lo contrario la
+     * semana en curso aparecería entera en gris, sin ningún día agendable.
+     */
+    private fun referenceMonday(): LocalDate {
+        val today = LocalDate.now()
+        val anchor = if (today.dayOfWeek == DayOfWeek.SATURDAY || today.dayOfWeek == DayOfWeek.SUNDAY) {
+            today.with(TemporalAdjusters.next(DayOfWeek.MONDAY))
+        } else {
+            today
         }
-        return days
+        return anchor.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
     }
 
     /** Al elegir un día habilitado, recién ahí se consulta la BD por las horas de ESE día. */
@@ -98,6 +141,8 @@ class SlotSelectionViewModel(
 
     data class DayOption(val date: LocalDate, val enabled: Boolean, val selected: Boolean)
 
+    data class WeekState(val label: String, val canGoPrev: Boolean, val canGoNext: Boolean)
+
     sealed class TimeUiState {
         object Loading : TimeUiState()
         object Empty : TimeUiState()
@@ -108,5 +153,10 @@ class SlotSelectionViewModel(
         override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T {
             return SlotSelectionViewModel(VitusRepository.getInstance(context), userId) as T
         }
+    }
+
+    companion object {
+        /** Cuántas semanas hacia adelante se puede agendar. */
+        private const val MAX_WEEK_OFFSET = 4
     }
 }

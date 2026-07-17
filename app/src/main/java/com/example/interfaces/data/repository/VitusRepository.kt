@@ -179,11 +179,10 @@ class VitusRepository private constructor(context: Context) {
     }
 
     private suspend fun ensureDoctorsSeeded(specialtyIds: Map<String, Long>): Map<String, Long> {
+        // La agenda solo ofrece días de lunes a viernes, así que ningún médico atiende en fin de semana.
         val lunVie = setOf(DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY, DayOfWeek.FRIDAY)
-        val lunSab = lunVie + DayOfWeek.SATURDAY
         val marVie = setOf(DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY, DayOfWeek.FRIDAY)
         val lunJue = setOf(DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY)
-        val todosLosDias = DayOfWeek.entries.toSet()
 
         val items = listOf(
             DoctorEntity(
@@ -199,7 +198,7 @@ class VitusRepository private constructor(context: Context) {
             DoctorEntity(
                 fullName = "Dr. Luis Torres",
                 specialtyId = specialtyIds.getValue("Cardiología"),
-                workDays = lunSab,
+                workDays = lunVie,
                 startTime = LocalTime.of(14, 0),
                 endTime = LocalTime.of(18, 0),
                 consultationRoom = "Consultorio 302",
@@ -239,7 +238,7 @@ class VitusRepository private constructor(context: Context) {
             DoctorEntity(
                 fullName = "Dr. Carlos Vega",
                 specialtyId = specialtyIds.getValue("Medicina General"),
-                workDays = todosLosDias,
+                workDays = lunVie,
                 startTime = LocalTime.of(8, 0),
                 endTime = LocalTime.of(16, 0),
                 consultationRoom = "Consultorio 101",
